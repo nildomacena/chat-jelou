@@ -5,11 +5,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Widget</title>
+  <style>
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    /* Spinner animation */
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="loading-screen">
+    <div class="spinner"></div>
+  </div>
+
   <script defer src="https://cdn.jelou.ai/widgets/loader.js"></script>
   <script>
+    function hideLoadingScreen() {
+      const loading = document.getElementById('loading-screen');
+      if (loading) {
+        loading.style.display = 'none';
+      }
+    }
+
     document.addEventListener('jelou-widget:load', () => {
       const widgetService = new WidgetService({
         apiKey: 'Yzc4NDBlNmUtZGViNi00ZmVhLTk1ODQtNDYwODkyYzY3NzRh'
@@ -18,9 +63,19 @@
       widgetService.connect({}).then((widgetInstance) => {
         console.log("done");
 
-        // Verifica se autoShow não está ativado para evitar conflitos
+        console.log(widgetInstance);
+
+        if (widgetInstance.on) {
+          widgetInstance.on("open", () => {
+            hideLoadingScreen();
+          });
+        }
+
         if (!widgetInstance.autoShow) {
-          widgetInstance.open();
+          setTimeout(() => {
+            widgetInstance.open();
+            hideLoadingScreen();
+          }, 1000);
         }
 
         widgetInstance.on("close", () => {
@@ -43,47 +98,3 @@
 </body>
 
 </html>
-<!-- 
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Widget</title>
-</head>
-
-<body>
-  <script defer src="https://cdn.jelou.ai/widgets/loader.js"></script>
-  <script>
-    document.addEventListener('jelou-widget:load', () => {
-      const widgetService = new WidgetService({
-        apiKey: 'MjBjY2ZjOGEtN2M1OC00NzgwLTg3YWYtMWVjNDg3NWI2MDk4'
-      });
-
-      widgetService.connect({}).then((widgetInstance) => {
-        console.log("done");
-
-        if (!widgetInstance.autoShow) {
-          widgetInstance.open();
-        }
-
-        widgetInstance.on("close", () => {
-          console.log('closed');
-          if (window.CloseChannel && typeof window.CloseChannel.postMessage === 'function') {
-            window.CloseChannel.postMessage('closed');
-          }
-        });
-
-        const startButton = document.querySelector("[data-jelou-start-button=true]");
-        if (startButton && startButton.disabled) {
-          startButton.disabled = false;
-        }
-      });
-
-      window.widgetService = widgetService;
-    });
-  </script>
-</body>
-
-</html> -->
