@@ -1,4 +1,50 @@
 <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Widget</title>
+</head>
+
+<body>
+  <script defer src="https://cdn.jelou.ai/widgets/loader.js"></script>
+  <script>
+    document.addEventListener('jelou-widget:load', () => {
+      const widgetService = new WidgetService({
+        apiKey: 'Yzc4NDBlNmUtZGViNi00ZmVhLTk1ODQtNDYwODkyYzY3NzRh'
+      });
+
+      widgetService.connect({}).then((widgetInstance) => {
+        console.log("done");
+
+        // Verifica se autoShow não está ativado para evitar conflitos
+        if (!widgetInstance.autoShow) {
+          widgetInstance.open();
+        }
+
+        widgetInstance.on("close", () => {
+          console.log('closed');
+          if (window.CloseChannel && typeof window.CloseChannel.postMessage === 'function') {
+            window.CloseChannel.postMessage('closed');
+          }
+        });
+
+        // Habilita o botão de início se estiver desativado
+        const startButton = document.querySelector("[data-jelou-start-button=true]");
+        if (startButton && startButton.disabled) {
+          startButton.disabled = false;
+        }
+      });
+
+      window.widgetService = widgetService;
+    });
+  </script>
+</body>
+
+</html>
+<!-- 
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -40,4 +86,4 @@
   </script>
 </body>
 
-</html>
+</html> -->
